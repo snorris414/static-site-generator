@@ -1,6 +1,7 @@
 import re
 from block_to_html import markdown_to_html_node
 import os
+from pathlib import Path
 
 
 def extract_title(markdown):
@@ -18,27 +19,28 @@ def extract_title(markdown):
     return title
 
 
-def generate_page(from_path, template_path, dest_path):
-    print(f"Generating page from {from_path} to {dest_path} using {template_path}")
+def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
+    for file in os.listdir(dir_path_content):
+        content_file_path = os.path.join(dir_path_content, file)
+        if os.path.isfile(content_file_path):
+            file_path = Path(content_file_path)
+            file_contents = file_path.read_text()
 
-    file_contents = None
-    with open(from_path) as f:
-        file_contents = f.read()
+            html_node = markdown_to_html_node(file_contents)
+            html_str = html_node.to_html()
 
-    template_file_contents = None
-    with open(template_path) as f:
-        template_file_contents = f.read()
+            title = extract_title(file_contents)
 
-    html_node = markdown_to_html_node(file_contents)
-    html_str = html_node.to_html()
-
-    title = extract_title(file_contents)
-
-    gen_html = template_file_contents.replace("{{ Title }}", title).replace(
-        "{{ Content }}", html_str
-    )
-
-    os.makedirs(dest_path, exist_ok=True)
-
-    with open(os.path.join(dest_path, "index.html"), "w") as f:
-        f.write(gen_html)
+            template_file_contents = Path(template_path).read_text()
+            gen_html = template_file_contents.replace("{{ Title }}", title).replace(
+                "{{ Content }}", html_str
+            )
+            dest_file_path = Path(os.path.join(dest_dir_path, "index.html"))
+            Path(dest_dir_path).mkdir(parents=True, exist_ok=True)
+            dest_file_path.write_text(gen_html)
+        else:
+            generate_pages_recursive(
+                os.path.join(dir_path_content, file),
+                template_path,
+                os.path.join(dest_dir_path, file),
+            )

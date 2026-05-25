@@ -1,5 +1,5 @@
 from file_cp import file_cp
-from generate_page import generate_page
+from generate_page import generate_pages_recursive
 
 
 def main():
@@ -8,7 +8,7 @@ def main():
 
     file_cp(source_dir, dest_dir)
 
-    generate_page("content/index.md", "template.html", "public")
+    generate_pages_recursive("content", "template.html", "public")
 
 
 main()
