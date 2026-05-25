@@ -19,7 +19,7 @@ def extract_title(markdown):
     return title
 
 
-def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
+def generate_pages_recursive(dir_path_content, template_path, dest_dir_path, base_path):
     for file in os.listdir(dir_path_content):
         content_file_path = os.path.join(dir_path_content, file)
         if os.path.isfile(content_file_path):
@@ -35,6 +35,8 @@ def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
             gen_html = template_file_contents.replace("{{ Title }}", title).replace(
                 "{{ Content }}", html_str
             )
+            gen_html = gen_html.replace('href="/', f'href="{base_path}')
+            gen_html = gen_html.replace('src="/', f'src="{base_path}')
             dest_file_path = Path(os.path.join(dest_dir_path, "index.html"))
             Path(dest_dir_path).mkdir(parents=True, exist_ok=True)
             dest_file_path.write_text(gen_html)
@@ -43,4 +45,5 @@ def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
                 os.path.join(dir_path_content, file),
                 template_path,
                 os.path.join(dest_dir_path, file),
+                base_path,
             )
