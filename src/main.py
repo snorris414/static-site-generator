@@ -9,11 +9,11 @@ def main():
         base_path = sys.argv[1]
 
     source_dir = "static"
-    dest_dir = "public"
+    dest_dir = "docs"
 
     file_cp(source_dir, dest_dir)
 
-    generate_pages_recursive("content", "template.html", "public", base_path)
+    generate_pages_recursive("content", "template.html", "docs", base_path)
 
 
 main()
